@@ -1,0 +1,5 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "Breakouts")(type "KiCad")(uri "${KIPRJMOD}/Breakouts.kicad_sym")(options "")(descr ""))
+  (lib (name "teensy")(type "Legacy")(uri "C:/Users/Harrison/Downloads/teensy_library-master/teensy_library-master/teensy.lib")(options "")(descr ""))
+)
