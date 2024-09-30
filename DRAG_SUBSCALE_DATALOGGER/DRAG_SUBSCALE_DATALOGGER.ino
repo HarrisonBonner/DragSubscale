@@ -79,7 +79,7 @@ void makeFileHeader() {
 
   // if the file is available, write to it:
   if (dataFile) {
-    dataFile.println("TIME \t ALTITUDE \t ORIENTATION_X \t ORIENTATION_Y \t ORIENTATION_Z \t ANGVELOCITY_X \t ANGVELOCITY_Y \t ANGVELOCITY_Z \t LINEARACCEL_X \t LINEARACCEL_Y \t LINEARACCEL_Z \t MAGNETOMETER_X \t MAGNETOMETER_Y \t MAGNETOMETER_Z \t ACCELEROMETER_X \t ACCELEROMETER_Y \t ACCELEROMETER_Z \t GRAVITY_X \t GRAVITY_Y \t GRAVITY_Z \t");
+    dataFile.println("TIME\tALTITUDE\tORIENTATION_X\tORIENTATION_Y\tORIENTATION_Z\tANGVELOCITY_X\tANGVELOCITY_Y\tANGVELOCITY_Z\tLINEARACCEL_X\tLINEARACCEL_Y\tLINEARACCEL_Z\tMAGNETOMETER_X\tMAGNETOMETER_Y\tMAGNETOMETER_Z\tACCELEROMETER_X\tACCELEROMETER_Y\tACCELEROMETER_Z\tGRAVITY_X\tGRAVITY_Y\tGRAVITY_Z\t");
     dataFile.close();
     Serial.println("Header made");
     // print to the serial port too:
@@ -91,14 +91,12 @@ void makeFileHeader() {
 
 
 String altitudeRecording() {
-  String result = "";
+  String result = " ";
   if (!bmp.performReading()) {
     Serial.println("Failed to perform reading :(");
     return "ERROR READING BMP";
   }
-
   result += bmp.readAltitude(SEALEVELPRESSURE_HPA);
-  result += " m";
   result += "\t";
 
   return result;
