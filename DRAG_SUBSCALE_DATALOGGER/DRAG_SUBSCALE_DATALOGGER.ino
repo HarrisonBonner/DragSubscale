@@ -21,6 +21,8 @@ First subscale launch data collection script
 // Teensy 3.5 & 3.6 & 4.1 on-board: BUILTIN_SDCARD
 const int chipSelect = BUILTIN_SDCARD;
 
+#define buzzerPin 3
+
 
 #define SEALEVELPRESSURE_HPA (1013.25)
 
@@ -36,6 +38,7 @@ void setup() {
   //  ;  // wait for serial port to connect.
   //}
 
+  pinMode(buzzerPin, OUTPUT);
 
   Serial.print("Initializing SD card...");
 
@@ -168,6 +171,13 @@ String bnoRecording() {
 }
 
 
+void beepBuzzer(){
+  digitalWrite(buzzerPin, HIGH);
+  delay(100);
+  digitalWrite(buzzerPin, LOW);
+}
+
+
 
 void loop() {
   // make a string for assembling the data to log:
@@ -189,5 +199,5 @@ void loop() {
     // if the file isn't open, pop up an error:
     Serial.println("error opening datalog.txt");
   }
-  delay(100);  // run at a reasonable not-too-fast speed
+  beepBuzzer();  // run at a reasonable not-too-fast speed
 }
