@@ -40,7 +40,7 @@ void setup() {
 
   pinMode(buzzerPin, OUTPUT);
   pinMode(keySwitchPin, INPUT);
-  
+
   Serial.print("Initializing SD card...");
 
   // see if the card is present and can be initialized:
@@ -75,10 +75,9 @@ void setup() {
       ;
   }
 
-  for(int i = 0; i < 10; i++)
-  beepBuzzer(500);
-
-
+  for (int i = 0; i < 10; i++) {
+    beepBuzzer(500);
+  }
 }
 
 void makeFileHeader() {
@@ -175,35 +174,37 @@ String bnoRecording() {
 }
 
 
-void beepBuzzer(int length){
-  digitalWrite(buzzerPin, HIGH);
-  delay(length);
-  digitalWrite(buzzerPin, LOW);
+void beepBuzzer(int length) {
+  tone(buzzerPin, 262);
+  delay(length >> 2);
+  noTone(buzzerPin);
+  delay(length >> 2);
+
 }
 
 
 
 void loop() {
-  if(digitalRead(keySwitchPin)){
-  // make a string for assembling the data to log:
-  String dataString = "";
-  dataString += millis();
-  dataString += altitudeRecording();
-  dataString += bnoRecording();
+  if (digitalRead(keySwitchPin)) {
+    // make a string for assembling the data to log:
+    String dataString = "";
+    dataString += millis();
+    dataString += altitudeRecording();
+    dataString += bnoRecording();
 
-  // open the file.
-  File dataFile = SD.open("datalog.txt", FILE_WRITE);
+    // open the file.
+    File dataFile = SD.open("datalog.txt", FILE_WRITE);
 
-  // if the file is available, write to it:
-  if (dataFile) {
-    dataFile.println(dataString);
-    dataFile.close();
-    // print to the serial port too:
-    Serial.println(dataString);
-  } else {
-    // if the file isn't open, pop up an error:
-    Serial.println("error opening datalog.txt");
-  }
-  beepBuzzer(100);  // run at a reasonable not-too-fast speed
+    // if the file is available, write to it:
+    if (dataFile) {
+      dataFile.println(dataString);
+      dataFile.close();
+      // print to the serial port too:
+      Serial.println(dataString);
+    } else {
+      // if the file isn't open, pop up an error:
+      Serial.println("error opening datalog.txt");
+    }
+    beepBuzzer(100);  // Buzzer has built in delay using parameter
   }
 }

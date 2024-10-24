@@ -2815,17 +2815,17 @@
 	)
 	(wire
 		(pts
-			(xy 158.75 116.84) (xy 170.18 116.84)
+			(xy 158.75 114.3) (xy 170.18 114.3)
 		)
 		(stroke
 			(width 0)
 			(type default)
 		)
-		(uuid "e72710af-297e-450e-80f7-c3914121eb82")
+		(uuid "e6cf183c-eb42-4da3-9489-a7a0b55003fa")
 	)
 	(wire
 		(pts
-			(xy 170.18 97.79) (xy 170.18 116.84)
+			(xy 170.18 97.79) (xy 170.18 114.3)
 		)
 		(stroke
 			(width 0)
