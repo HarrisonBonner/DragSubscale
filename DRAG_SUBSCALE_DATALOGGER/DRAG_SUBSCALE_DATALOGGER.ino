@@ -22,7 +22,7 @@ First subscale launch data collection script
 const int chipSelect = BUILTIN_SDCARD;
 
 #define buzzerPin 3
-
+#define keySwitchPin 34
 
 #define SEALEVELPRESSURE_HPA (1013.25)
 
@@ -39,7 +39,8 @@ void setup() {
   //}
 
   pinMode(buzzerPin, OUTPUT);
-
+  pinMode(keySwitchPin, INPUT);
+  
   Serial.print("Initializing SD card...");
 
   // see if the card is present and can be initialized:
@@ -73,6 +74,9 @@ void setup() {
     while (1)
       ;
   }
+
+  for(int i = 0; i < 10; i++)
+  beepBuzzer(500);
 
 
 }
@@ -171,15 +175,16 @@ String bnoRecording() {
 }
 
 
-void beepBuzzer(){
+void beepBuzzer(int length){
   digitalWrite(buzzerPin, HIGH);
-  delay(100);
+  delay(length);
   digitalWrite(buzzerPin, LOW);
 }
 
 
 
 void loop() {
+  if(digitalRead(keySwitchPin)){
   // make a string for assembling the data to log:
   String dataString = "";
   dataString += millis();
@@ -199,5 +204,6 @@ void loop() {
     // if the file isn't open, pop up an error:
     Serial.println("error opening datalog.txt");
   }
-  beepBuzzer();  // run at a reasonable not-too-fast speed
+  beepBuzzer(100);  // run at a reasonable not-too-fast speed
+  }
 }
