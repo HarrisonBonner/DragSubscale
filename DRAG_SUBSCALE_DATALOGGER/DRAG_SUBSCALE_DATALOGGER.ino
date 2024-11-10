@@ -97,7 +97,7 @@ void makeFileHeader() {
 
 
 String altitudeRecording() {
-  String result = " ";
+  String result = "\t";
   if (!bmp.performReading()) {
     Serial.println("Failed to perform reading :(");
     return "ERROR READING BMP";
