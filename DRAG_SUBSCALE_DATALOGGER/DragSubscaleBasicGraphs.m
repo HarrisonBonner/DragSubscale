@@ -2,6 +2,9 @@ clc, clear, close all
 % Load data from Excel file, skipping the first row
 data = readtable('DragDatalog.xlsx', 'ReadVariableNames', true); % Replace with your actual file name
 
+%Define sample number of moving means
+movMeanSample = 10;
+
 % Column 1: TIME
 time = data{:, 1};
 if iscell(time)
@@ -64,6 +67,7 @@ if iscell(linearaccel_x)
     linearaccel_x = cellfun(@str2double, linearaccel_x);
 end
 linearaccel_x = linearaccel_x(~isnan(linearaccel_x)); % Remove NaN values
+linearaccel_xMovMean = movmean(linearaccel_x, movMeanSample);
 
 % Column 10: LINEARACCEL_Y
 linearaccel_y = data{:, 10};
@@ -71,6 +75,7 @@ if iscell(linearaccel_y)
     linearaccel_y = cellfun(@str2double, linearaccel_y);
 end
 linearaccel_y = linearaccel_y(~isnan(linearaccel_y)); % Remove NaN values
+linearaccel_yMovMean = movmean(linearaccel_y, movMeanSample);
 
 % Column 11: LINEARACCEL_Z
 linearaccel_z = data{:, 11};
@@ -78,6 +83,7 @@ if iscell(linearaccel_z)
     linearaccel_z = cellfun(@str2double, linearaccel_z);
 end
 linearaccel_z = linearaccel_z(~isnan(linearaccel_z)); % Remove NaN values
+linearaccel_zMovMean = movmean(linearaccel_z, movMeanSample);
 
 % Column 12: MAGNETOMETER_X
 magnetometer_x = data{:, 12};
@@ -106,6 +112,8 @@ if iscell(accelerometer_x)
     accelerometer_x = cellfun(@str2double, accelerometer_x);
 end
 accelerometer_x = accelerometer_x(~isnan(accelerometer_x)); % Remove NaN values
+accelerometer_xMovMean = movmean(accelerometer_x, movMeanSample);
+
 
 % Column 16: ACCELEROMETER_Y
 accelerometer_y = data{:, 16};
@@ -113,6 +121,7 @@ if iscell(accelerometer_y)
     accelerometer_y = cellfun(@str2double, accelerometer_y);
 end
 accelerometer_y = accelerometer_y(~isnan(accelerometer_y)); % Remove NaN values
+accelerometer_yMovMean = movmean(accelerometer_y, movMeanSample);
 
 % Column 17: ACCELEROMETER_Z
 accelerometer_z = data{:, 17};
@@ -120,6 +129,7 @@ if iscell(accelerometer_z)
     accelerometer_z = cellfun(@str2double, accelerometer_z);
 end
 accelerometer_z = accelerometer_z(~isnan(accelerometer_z)); % Remove NaN values
+accelerometer_zMovMean = movmean(accelerometer_z, movMeanSample);
 
 % Column 18: GRAVITY_X
 gravity_x = data{:, 18};
@@ -207,21 +217,21 @@ grid on;
 % Plot: Linear Acceleration (X, Y, Z) vs Time
 figure;
 subplot(3, 1, 1);
-plot(time_shifted, linearaccel_x);
+plot(time_shifted, linearaccel_x, time_shifted, linearaccel_xMovMean);
 xlabel('Time (seconds)');
 ylabel('Linear Accel X (m/s^2)');
 title('Linear Accel X vs Time');
 grid on;
 
 subplot(3, 1, 2);
-plot(time_shifted, linearaccel_y);
+plot(time_shifted, linearaccel_y, time_shifted, linearaccel_yMovMean);
 xlabel('Time (seconds)');
 ylabel('Linear Accel Y (m/s^2)');
 title('Linear Accel Y vs Time');
 grid on;
 
 subplot(3, 1, 3);
-plot(time_shifted, linearaccel_z);
+plot(time_shifted, linearaccel_z, time_shifted, linearaccel_zMovMean);
 xlabel('Time (seconds)');
 ylabel('Linear Accel Z (m/s^2)');
 title('Linear Accel Z vs Time');
@@ -253,21 +263,21 @@ grid on;
 % Plot: Accelerometer (X, Y, Z) vs Time
 figure;
 subplot(3, 1, 1);
-plot(time_shifted, accelerometer_x);
+plot(time_shifted, accelerometer_x, time_shifted, accelerometer_xMovMean);
 xlabel('Time (seconds)');
 ylabel('Accelerometer X (m/s^2)');
 title('Accelerometer X vs Time');
 grid on;
 
 subplot(3, 1, 2);
-plot(time_shifted, accelerometer_y);
+plot(time_shifted, accelerometer_y, time_shifted, accelerometer_yMovMean);
 xlabel('Time (seconds)');
 ylabel('Accelerometer Y (m/s^2)');
 title('Accelerometer Y vs Time');
 grid on;
 
 subplot(3, 1, 3);
-plot(time_shifted, accelerometer_z);
+plot(time_shifted, accelerometer_z, time_shifted, accelerometer_zMovMean);
 xlabel('Time (seconds)');
 ylabel('Accelerometer Z (m/s^2)');
 title('Accelerometer Z vs Time');
