@@ -74,7 +74,7 @@ void setup() {
     while (1)
       ;
   }
-  bno.setMode(adafruit_bno055_opmode_t mode)
+  bno.setMode(OPERATION_MODE_AMG);
   bno.setGRange(16);
 
   for (int i = 0; i < 10; i++) {
@@ -84,9 +84,6 @@ void setup() {
 
 
 
-
-/************************************************************************/
-//Go to ACC_CONFIG Reg and write bottom two bits as 11  for 16G
 
 
 
