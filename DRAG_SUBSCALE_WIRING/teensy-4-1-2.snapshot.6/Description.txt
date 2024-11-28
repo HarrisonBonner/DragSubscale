@@ -1,0 +1,55 @@
+Teensy 4.1
+
+Link to CAD files:
+https://grabcad.com/library/teensy-4-1-2
+
+One of my favorite microcontrollers.
+Just wish it had better deep sleep and idle capabilities.
+
+Manufacturer site:
+https://www.pjrc.com/store/teensy41.html
+
+Please support Paul since he has contributed heavily into the development of this board and lots of Teensy and Arduino libraries.
+
+Has a fast clock speed of 600 MHz.
+Can be overclocked to 1000 MHz using air cooling.
+It has dedicated float point units.
+An ethernet controller and connection.
+Lots of pins have PWM capability.
+
+Specifications:
+ARM Cortex-M7 at 600 MHz
+Float point math unit, 64 & 32 bits
+7936K Flash, 1024K RAM (512K tightly coupled), 4K EEPROM (emulated)
+QSPI memory expansion, locations for 2 extra RAM or Flash chips
+USB device 480 Mbit/sec & USB host 480 Mbit/sec
+55 digital input/output pins, 35 PWM output pins
+18 analog input pins
+8 serial, 3 SPI, 3 I2C ports
+2 I2S/TDM and 1 S/PDIF digital audio port
+3 CAN Bus (1 with CAN FD)
+1 SDIO (4 bit) native SD Card port
+Ethernet 10/100 Mbit with DP83825 PHY
+32 general purpose DMA channels
+Cryptographic Acceleration & Random Number Generator
+RTC for date/time
+Programmable FlexIO
+Pixel Processing Pipeline
+Peripheral cross triggering
+Power On/Off management
+
+Check out some of the cool applications using this microcontroller:
+
+Making an insanely fast Speeduino ECU
+https://www.youtube.com/watch?v=xgNpUEs6CWE
+
+TeensyStep High Speed Stepper Library
+https://www.youtube.com/watch?v=Fzt75I_Zi14
+
+Why I put a Teensy in Every Project
+https://www.youtube.com/watch?v=75IvTqRwNsE
+
+DIY RGB led cube 16x16x16 Arduino PlatformIO Teensy 4.0
+https://www.youtube.com/watch?v=xidPiL3ZEh8
+
+#CAD #SolidWorks #3dmodel #teensy #mcu #microcontroller #teensy41 #600Mhz #1000Mhz

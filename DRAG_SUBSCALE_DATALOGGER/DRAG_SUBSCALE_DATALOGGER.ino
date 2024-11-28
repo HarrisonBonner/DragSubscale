@@ -14,8 +14,8 @@ First subscale launch data collection script
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include "Adafruit_BMP3XX.h"
-#include <Adafruit_BNO055.h>
-#include <utility/imumaths.h>
+#include "Adafruit_BNO055.h"
+#include "./utility/imumaths.h"
 
 // change this to match your SD shield or module;
 // Teensy 3.5 & 3.6 & 4.1 on-board: BUILTIN_SDCARD
@@ -74,11 +74,22 @@ void setup() {
     while (1)
       ;
   }
+  bno.setMode(adafruit_bno055_opmode_t mode)
+  bno.setGRange(16);
 
   for (int i = 0; i < 10; i++) {
     beepBuzzer(500);
   }
 }
+
+
+
+
+/************************************************************************/
+//Go to ACC_CONFIG Reg and write bottom two bits as 11  for 16G
+
+
+
 
 void makeFileHeader() {
   File dataFile = SD.open("datalog.txt", FILE_WRITE);
@@ -179,7 +190,6 @@ void beepBuzzer(int length) {
   delay(length >> 2);
   noTone(buzzerPin);
   delay(length >> 2);
-
 }
 
 
