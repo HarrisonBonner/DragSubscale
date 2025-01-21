@@ -42,8 +42,8 @@
 		(pad_to_mask_clearance 0)
 		(allow_soldermask_bridges_in_footprints no)
 		(pcbplotparams
-			(layerselection 0x00010fc_ffffffff)
-			(plot_on_all_layers_selection 0x0000000_00000000)
+			(layerselection 0x0000020_7ffffffe)
+			(plot_on_all_layers_selection 0x00010a0_80000001)
 			(disableapertmacros no)
 			(usegerberextensions no)
 			(usegerberattributes yes)
@@ -72,9 +72,9 @@
 			(plotinvisibletext no)
 			(sketchpadsonfab no)
 			(subtractmaskfromsilk no)
-			(outputformat 1)
+			(outputformat 4)
 			(mirror no)
-			(drillshape 1)
+			(drillshape 0)
 			(scaleselection 1)
 			(outputdirectory "")
 		)
@@ -384,7 +384,7 @@
 		(uuid "710626ca-c6ca-4772-bc83-932e28b15035")
 		(at 177.26 84.8184 180)
 		(property "Reference" "U1"
-			(at 0 -10.16 0)
+			(at 7.76 -0.1816 0)
 			(layer "F.SilkS")
 			(uuid "c1933a58-099c-4f79-a639-4965e108c150")
 			(effects
@@ -2170,7 +2170,7 @@
 		(descr "JST XA series connector, B02B-XASK-1 (http://www.jst-mfg.com/product/pdf/eng/eXA1.pdf), generated with kicad-footprint-generator")
 		(tags "connector JST XA vertical")
 		(property "Reference" "J2"
-			(at 1.25 -4.4 360)
+			(at 1.25 -4.4 0)
 			(layer "F.SilkS")
 			(uuid "a232e5ce-1bea-4947-87a0-c7f2e66a872d")
 			(effects
@@ -2181,7 +2181,7 @@
 			)
 		)
 		(property "Value" "Conn_01x02"
-			(at 1.25 4.4 360)
+			(at 1.25 4.4 0)
 			(layer "F.Fab")
 			(uuid "bed9a7b6-1dbd-419b-8480-06f84f4d6892")
 			(effects
@@ -2536,7 +2536,7 @@
 			(uuid "6f23c08e-905e-44e5-b079-59199ecb89b3")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 1.25 1.5 360)
+			(at 1.25 1.5 0)
 			(layer "F.Fab")
 			(uuid "5dfe7bbd-55ce-41c6-9433-1385c49c5971")
 			(effects
@@ -3394,7 +3394,7 @@
 		(descr "JST EH series connector, B3B-EH-A (http://www.jst-mfg.com/product/pdf/eng/eEH.pdf), generated with kicad-footprint-generator")
 		(tags "connector JST EH vertical")
 		(property "Reference" "J4"
-			(at 2.5 -2.8 360)
+			(at 2.5 -2.8 0)
 			(layer "F.SilkS")
 			(uuid "72aaf302-b611-4fe5-b6f6-07d77ea87e45")
 			(effects
@@ -3405,7 +3405,7 @@
 			)
 		)
 		(property "Value" "Conn_01x03"
-			(at 2.5 3.4 360)
+			(at 2.5 3.4 0)
 			(layer "F.Fab")
 			(uuid "3738ca9f-0d3e-4ca3-b1af-b6b2b898ed17")
 			(effects
@@ -3710,7 +3710,7 @@
 			(uuid "5c317dfa-43ec-472d-bf68-30f859c7fc37")
 		)
 		(fp_text user "${REFERENCE}"
-			(at 2.5 2.31 360)
+			(at 2.5 2.31 0)
 			(layer "F.Fab")
 			(uuid "6bf683d1-5580-4d7d-b196-4cfaf2f7e7f3")
 			(effects

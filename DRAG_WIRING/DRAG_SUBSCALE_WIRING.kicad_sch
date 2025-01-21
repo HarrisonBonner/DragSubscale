@@ -4,6 +4,10 @@
 	(generator_version "8.0")
 	(uuid "cde5509e-855c-4e81-8dfd-51209b0efc45")
 	(paper "A4")
+	(title_block
+		(title "Drag Wiring")
+		(date "2024-12-29")
+	)
 	(lib_symbols
 		(symbol "BNO-055_1"
 			(exclude_from_sim no)
@@ -2674,7 +2678,7 @@
 	)
 	(wire
 		(pts
-			(xy 118.11 88.9) (xy 120.65 88.9)
+			(xy 118.11 86.36) (xy 120.65 86.36)
 		)
 		(stroke
 			(width 0)
@@ -2704,7 +2708,7 @@
 	)
 	(wire
 		(pts
-			(xy 118.11 91.44) (xy 120.65 91.44)
+			(xy 118.11 88.9) (xy 120.65 88.9)
 		)
 		(stroke
 			(width 0)
@@ -3005,7 +3009,7 @@
 	)
 	(wire
 		(pts
-			(xy 118.11 91.44) (xy 118.11 97.79)
+			(xy 118.11 88.9) (xy 118.11 97.79)
 		)
 		(stroke
 			(width 0)
@@ -3015,7 +3019,7 @@
 	)
 	(wire
 		(pts
-			(xy 118.11 82.55) (xy 118.11 88.9)
+			(xy 118.11 80.01) (xy 118.11 86.36)
 		)
 		(stroke
 			(width 0)
@@ -3061,7 +3065,7 @@
 		)
 		(uuid "df7ce935-4819-40e6-a8c8-43dd865a8bde")
 	)
-	(text_box "Mounting Hardware\n"
+	(text_box "External Hardware\n"
 		(exclude_from_sim no)
 		(at 146.05 86.36 0)
 		(size 138.43 53.34)
@@ -3080,15 +3084,35 @@
 		)
 		(uuid "f44b5a2d-79cd-4ab8-8958-55aa2fe5596d")
 	)
-	(text "12/29/24"
+	(text "Servo Connections"
 		(exclude_from_sim no)
-		(at 211.582 193.294 0)
+		(at 157.226 106.934 0)
 		(effects
 			(font
 				(size 1.27 1.27)
 			)
 		)
-		(uuid "0ea4f740-5a30-41eb-b7f2-812d7a147434")
+		(uuid "05e71db0-3c2e-40ad-93dc-49bae7044718")
+	)
+	(text "Keyswitch pulldown input"
+		(exclude_from_sim no)
+		(at 132.334 80.518 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "516d9d22-061d-453f-9967-f1bbd6cfc84c")
+	)
+	(text "Battery Input\n"
+		(exclude_from_sim no)
+		(at 113.03 18.034 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "65858ff9-4bf4-4aa8-b3b4-68939e9350e7")
 	)
 	(global_label "3v3"
 		(shape input)
@@ -3290,7 +3314,7 @@
 	)
 	(global_label "3v3"
 		(shape input)
-		(at 118.11 82.55 90)
+		(at 118.11 80.01 90)
 		(fields_autoplaced yes)
 		(effects
 			(font
@@ -3300,7 +3324,7 @@
 		)
 		(uuid "cdd07ff3-107e-4033-8ba1-3115429aa318")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 118.11 76.1782 90)
+			(at 118.11 73.6382 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4273,7 +4297,7 @@
 	)
 	(symbol
 		(lib_id "Connector_Generic:Conn_01x02")
-		(at 125.73 88.9 0)
+		(at 125.73 86.36 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -4282,7 +4306,7 @@
 		(fields_autoplaced yes)
 		(uuid "a08c9a13-5ad6-49f8-8c5c-a7dce4aa180c")
 		(property "Reference" "J3"
-			(at 128.27 88.8999 0)
+			(at 128.27 86.3599 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4291,7 +4315,7 @@
 			)
 		)
 		(property "Value" "Conn_01x02"
-			(at 128.27 91.4399 0)
+			(at 128.27 88.8999 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4300,7 +4324,7 @@
 			)
 		)
 		(property "Footprint" "Connector_JST:JST_XA_B02B-XASK-1_1x02_P2.50mm_Vertical"
-			(at 125.73 88.9 0)
+			(at 125.73 86.36 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4309,7 +4333,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 125.73 88.9 0)
+			(at 125.73 86.36 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4318,7 +4342,7 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x02, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 125.73 88.9 0)
+			(at 125.73 86.36 0)
 			(effects
 				(font
 					(size 1.27 1.27)
