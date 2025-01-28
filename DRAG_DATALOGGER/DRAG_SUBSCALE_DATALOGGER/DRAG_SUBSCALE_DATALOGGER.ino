@@ -16,19 +16,41 @@ First subscale launch data collection script
 #include "Adafruit_BMP3XX.h"
 #include "Adafruit_BNO055.h"
 #include "./utility/imumaths.h"
+#include "PWMServo.h"
 
-// change this to match your SD shield or module;
 // Teensy 3.5 & 3.6 & 4.1 on-board: BUILTIN_SDCARD
 const int chipSelect = BUILTIN_SDCARD;
 
+//Define Pin connections
 #define buzzerPin 3
 #define keySwitchPin 34
+#define servoPin 7
+
 
 #define SEALEVELPRESSURE_HPA (1013.25)
 
+//Define Devices
 Adafruit_BMP3XX bmp;
-//Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x28, &Wire);
 Adafruit_BNO055 bno;
+PWMServo dragServo;
+
+//Define global Variables
+double altitude;
+double previousAltitude;
+
+double zAccel;
+
+double deltaTime = 0;
+double previousTime = 0;
+
+double velocityThreshold;
+int velocityAboveCountThreshold;
+bool launchDetected = false;
+
+double burnoutThreshold;
+int burnoutBelowCountThreshold;
+bool burnoutDetected = false;
+
 
 void setup() {
   //TODO REMOVE ME FOR ACTUAL ON BOARD TEST!!
@@ -66,6 +88,11 @@ void setup() {
   bmp.setIIRFilterCoeff(BMP3_IIR_FILTER_COEFF_3);
   bmp.setOutputDataRate(BMP3_ODR_50_HZ);
 
+  //Initlize starting altitude
+  if (!bmp.performReading()) {
+    Serial.println("Failed to perform reading :(");
+  }
+  previousAltitude = bmp.readAltitude(SEALEVELPRESSURE_HPA);
 
   /* Initialise the sensor */
   if (!bno.begin()) {
@@ -75,17 +102,16 @@ void setup() {
       ;
   }
   bno.setMode(OPERATION_MODE_AMG);
-  bno.setGRange(16);
+  //bno.setGRange(16);
+
+
+  dragServo.attach(servoPin);
+  dragServo.write(90);
 
   for (int i = 0; i < 10; i++) {
     beepBuzzer(500);
   }
 }
-
-
-
-
-
 
 
 void makeFileHeader() {
@@ -110,7 +136,8 @@ String altitudeRecording() {
     Serial.println("Failed to perform reading :(");
     return "ERROR READING BMP";
   }
-  result += bmp.readAltitude(SEALEVELPRESSURE_HPA);
+  altitude = bmp.readAltitude(SEALEVELPRESSURE_HPA);
+  result += altitude;
   result += "\t";
 
   return result;
@@ -181,7 +208,6 @@ String bnoRecording() {
   return result;
 }
 
-
 void beepBuzzer(int length) {
   tone(buzzerPin, 262);
   delay(length >> 2);
@@ -190,28 +216,101 @@ void beepBuzzer(int length) {
 }
 
 
+int numVelocityAboveThreshold = 0;
+bool checkIfLaunch() {
+
+  //Setup dt
+  double currentTime = millis();
+  deltaTime = currentTime - previousTime;
+  previousTime = currentTime;
+
+  //Setup dZ for velocity
+  double velocity = (altitude - previousAltitude) * deltaTime;
+  previousAltitude = altitude;
+
+  if (velocity > velocityThreshold) {
+    numVelocityAboveThreshold++;
+  } else {
+    numVelocityAboveThreshold = 0;
+  }
+
+  if (numVelocityAboveThreshold > velocityAboveCountThreshold) {
+    return true;
+  }
+
+  return false;
+}
+
+int numBurnoutBelowThreshold = 0;
+bool checkIfMotorBurnout() {
+
+  //Setup dt
+  double currentTime = millis();
+  deltaTime = currentTime - previousTime;
+  previousTime = currentTime;
+
+  //Checking that velocity is decreasing for X samples
+
+  //Setup dZ for velocity
+  double velocity = (altitude - previousAltitude) * deltaTime;
+  previousAltitude = altitude;
+
+
+  if (velocity < burnoutThreshold) {
+    numBurnoutBelowThreshold++;
+  } else {
+    numBurnoutBelowThreshold = 0;
+  }
+
+  if (numBurnoutBelowThreshold > burnoutBelowCountThreshold) {
+    return true;
+  }
+
+  return false;
+}
+
+void dataLog() {
+  // make a string for assembling the data to log:
+  String dataString = "";
+  dataString += millis();
+  dataString += altitudeRecording();
+  dataString += bnoRecording();
+
+  // open the file.
+  File dataFile = SD.open("datalog.txt", FILE_WRITE);
+
+  // if the file is available, write to it:
+  if (dataFile) {
+    dataFile.println(dataString);
+    dataFile.close();
+    // print to the serial port too:
+    Serial.println(dataString);
+  } else {
+    // if the file isn't open, pop up an error:
+    Serial.println("error opening datalog.txt");
+  }
+}
+
+void setDragPercent(int goal) {
+  //Math of angle rotation to percentage
+}
+
 
 void loop() {
   if (digitalRead(keySwitchPin)) {
-    // make a string for assembling the data to log:
-    String dataString = "";
-    dataString += millis();
-    dataString += altitudeRecording();
-    dataString += bnoRecording();
 
-    // open the file.
-    File dataFile = SD.open("datalog.txt", FILE_WRITE);
 
-    // if the file is available, write to it:
-    if (dataFile) {
-      dataFile.println(dataString);
-      dataFile.close();
-      // print to the serial port too:
-      Serial.println(dataString);
-    } else {
-      // if the file isn't open, pop up an error:
-      Serial.println("error opening datalog.txt");
-    }
+    dataLog();
     beepBuzzer(100);  // Buzzer has built in delay using parameter
+
+    if (launchDetected) {
+      if (burnoutDetected) {
+        //Control logic
+      } else {
+        checkIfMotorBurnout();
+      }
+    } else {
+      checkIfLaunch();
+    }
   }
 }
