@@ -1,6 +1,15 @@
 /* DRAG DATA COLLECTION
 First subscale launch data collection script
 
+
+To implement:
+
+Launch detection
+Motor burnout detectoin
+Ground level calibration
+
+
+
   
    Connections
    ===========
@@ -35,21 +44,15 @@ Adafruit_BNO055 bno;
 PWMServo dragServo;
 
 //Define global Variables
+
+double lastTimeRecording = 0;
+
 double altitude;
 double previousAltitude;
+double linearXAccel;
 
-double zAccel;
 
-double deltaTime = 0;
-double previousTime = 0;
-
-double velocityThreshold;
-int velocityAboveCountThreshold;
-bool launchDetected = false;
-
-double burnoutThreshold;
-int burnoutBelowCountThreshold;
-bool burnoutDetected = false;
+int clockRate = 100;  //in ms
 
 
 void setup() {
@@ -168,6 +171,7 @@ String printBNOEvent(sensors_event_t* event) {
     z = event->gyro.z;
   } else if (event->type == SENSOR_TYPE_LINEAR_ACCELERATION) {
     x = event->acceleration.x;
+    linearXAccel = x;
     y = event->acceleration.y;
     z = event->acceleration.z;
   } else if (event->type == SENSOR_TYPE_GRAVITY) {
@@ -205,6 +209,7 @@ String bnoRecording() {
   result += printBNOEvent(&magnetometerData);
   result += printBNOEvent(&accelerometerData);
   result += printBNOEvent(&gravityData);
+
   return result;
 }
 
@@ -215,58 +220,40 @@ void beepBuzzer(int length) {
   delay(length >> 2);
 }
 
+//Launch Detection Variables
+double launchAccelThreshold = 15;
+int accelAboveThresholdCount = 100;  //Sample * clcokRate = Time in ms
+bool launchDetected = false;
+int launchThresholdMetCount = 0;
 
-int numVelocityAboveThreshold = 0;
-bool checkIfLaunch() {
+void checkIfLaunch() {
 
-  //Setup dt
-  double currentTime = millis();
-  deltaTime = currentTime - previousTime;
-  previousTime = currentTime;
-
-  //Setup dZ for velocity
-  double velocity = (altitude - previousAltitude) * deltaTime;
-  previousAltitude = altitude;
-
-  if (velocity > velocityThreshold) {
-    numVelocityAboveThreshold++;
+  if (linearXAccel >= launchAccelThreshold) {
+    launchThresholdMetCount++;
   } else {
-    numVelocityAboveThreshold = 0;
+    launchThresholdMetCount = 0;
   }
 
-  if (numVelocityAboveThreshold > velocityAboveCountThreshold) {
-    return true;
-  }
-
-  return false;
+  if (launchThresholdMetCount >= accelAboveThresholdCount)
+    launchDetected = true;
 }
 
-int numBurnoutBelowThreshold = 0;
-bool checkIfMotorBurnout() {
 
-  //Setup dt
-  double currentTime = millis();
-  deltaTime = currentTime - previousTime;
-  previousTime = currentTime;
+//Burnout detection Variables
+double burnoutThreshold = 0;
+int burnoutBelowCountThreshold = 50;  //Sample * clcokRate = Time in ms
+int burnoutThresholdMetCount = 0;
+bool burnoutDetected = false;
 
-  //Checking that velocity is decreasing for X samples
-
-  //Setup dZ for velocity
-  double velocity = (altitude - previousAltitude) * deltaTime;
-  previousAltitude = altitude;
-
-
-  if (velocity < burnoutThreshold) {
-    numBurnoutBelowThreshold++;
+void checkIfMotorBurnout() {
+  if (linearXAccel < burnoutThreshold) {
+    burnoutThresholdMetCount++;
   } else {
-    numBurnoutBelowThreshold = 0;
+    burnoutThresholdMetCount = 0;
   }
 
-  if (numBurnoutBelowThreshold > burnoutBelowCountThreshold) {
-    return true;
-  }
-
-  return false;
+  if (burnoutThresholdMetCount >= burnoutBelowCountThreshold)
+    burnoutDetected = true;
 }
 
 void dataLog() {
@@ -284,33 +271,106 @@ void dataLog() {
     dataFile.println(dataString);
     dataFile.close();
     // print to the serial port too:
-    Serial.println(dataString);
+    //Serial.println(dataString);
   } else {
     // if the file isn't open, pop up an error:
     Serial.println("error opening datalog.txt");
   }
 }
 
-void setDragPercent(int goal) {
-  //Math of angle rotation to percentage
+double timeToExtend = 2000;
+bool firstExtendCall = true;
+bool dragExtended = false;
+bool extendTimeMet = false;
+double extendTime = 0;
+double extendLastTimeRecorded;
+void extendDrag() {
+
+  if (firstExtendCall) {
+    dragServo.write(180);
+    firstExtendCall = false;
+    extendLastTimeRecorded = millis();
+    Serial.println("Set Drag to extend");
+  }
+
+  extendTime += millis() - extendLastTimeRecorded;
+  extendLastTimeRecorded = millis();
+
+  if (extendTime >= timeToExtend && !dragExtended) {
+    dragServo.write(90);
+    dragExtended = true;
+  }
 }
 
+double timeToRetract = 2000;
+bool firstRetractCall = true;
+bool dragRetracted = false;
+bool retractTimeMet = false;
+double retractTime = 0;
+double retractLastTimeRecorded;
+void retractDrag() {
+  if (firstRetractCall) {
+    Serial.println("Set Drag to Retract");
+    dragServo.write(-180);
+    firstRetractCall = false;
+    retractLastTimeRecorded = millis();
+  }
+
+  retractTime += millis() - retractLastTimeRecorded;
+  retractLastTimeRecorded = millis();
+  if (retractTime >= timeToRetract && !dragRetracted) {
+    Serial.println("ended retraction");
+    dragServo.write(90);
+    dragRetracted = true;
+  }
+}
+
+bool controlLoopAllowed = true;
+
+double retractionWaitTime = 0;
+double retractionWaitTimeThreshold = 15000;
 
 void loop() {
   if (digitalRead(keySwitchPin)) {
 
 
     dataLog();
-    beepBuzzer(100);  // Buzzer has built in delay using parameter
+    beepBuzzer(clockRate);  // Buzzer has built in delay using parameter
 
-    if (launchDetected) {
-      if (burnoutDetected) {
-        //Control logic
+    if (controlLoopAllowed) {
+      //launchDetected = true;
+      if (launchDetected) {
+        //burnoutDetected = true;
+        if (burnoutDetected) {
+          //Control logic
+
+          //Extend Drag
+          extendDrag();
+          //Check for apogee
+
+          //After 15 seconds retract
+          if (dragExtended) {
+            retractionWaitTime += millis() - lastTimeRecording;
+          }
+
+          if (retractionWaitTime >= retractionWaitTimeThreshold) {
+            retractDrag();
+          }
+
+          //After retraction end control loop
+          if (dragRetracted) {
+            controlLoopAllowed = false;
+          }
+
+
+        } else {
+          checkIfMotorBurnout();
+        }
+
       } else {
-        checkIfMotorBurnout();
+        checkIfLaunch();
       }
-    } else {
-      checkIfLaunch();
     }
   }
+  lastTimeRecording = millis();
 }
