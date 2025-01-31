@@ -46,9 +46,9 @@ PWMServo dragServo;
 //Define global Variables
 
 double lastTimeRecording = 0;
-
 double altitude;
 double previousAltitude;
+
 double linearXAccel;
 
 
@@ -256,6 +256,28 @@ void checkIfMotorBurnout() {
     burnoutDetected = true;
 }
 
+int altitudeDecreaseCount = 0;
+bool apogeeFirstRun = true;
+double apogee = 0;
+void checkForApogee() {
+
+  if (apogeeFirstRun) {
+    previousAltitude = altitude;
+    apogeeFirstRun = false;
+  }
+
+  if(altitude < previousAltitude){
+     altitudeDecreaseCount++;
+  }
+  else{
+    altitudeDecreaseCount = 0;
+  }
+
+  if(altitudeDecreaseCount >= 10){
+
+  }
+}
+
 void dataLog() {
   // make a string for assembling the data to log:
   String dataString = "";
@@ -287,7 +309,7 @@ double extendLastTimeRecorded;
 void extendDrag() {
 
   if (firstExtendCall) {
-    dragServo.write(180);
+    dragServo.write(-180);
     firstExtendCall = false;
     extendLastTimeRecorded = millis();
     Serial.println("Set Drag to extend");
@@ -311,7 +333,7 @@ double retractLastTimeRecorded;
 void retractDrag() {
   if (firstRetractCall) {
     Serial.println("Set Drag to Retract");
-    dragServo.write(-180);
+    dragServo.write(180);
     firstRetractCall = false;
     retractLastTimeRecorded = millis();
   }
@@ -331,7 +353,7 @@ double retractionWaitTime = 0;
 double retractionWaitTimeThreshold = 15000;
 
 void loop() {
-  if (digitalRead(keySwitchPin)) {
+  if (digitalRead(keySwitchPin) || true) {
 
 
     dataLog();
@@ -339,15 +361,15 @@ void loop() {
 
     if (controlLoopAllowed) {
       //launchDetected = true;
-      if (launchDetected) {
+      if (launchDetected || true) {
         //burnoutDetected = true;
-        if (burnoutDetected) {
+        if (burnoutDetected ||true) {
           //Control logic
 
           //Extend Drag
           extendDrag();
           //Check for apogee
-
+          checkForApogee();
           //After 15 seconds retract
           if (dragExtended) {
             retractionWaitTime += millis() - lastTimeRecording;
