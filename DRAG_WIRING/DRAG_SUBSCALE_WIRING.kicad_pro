@@ -466,7 +466,7 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": "",
+      "plot": "pcbFiles/",
       "pos_files": "",
       "specctra_dsn": "",
       "step": "DRAG_SUBSCALE_WIRING.step",

@@ -48,6 +48,8 @@ PWMServo dragServo;
 double lastTimeRecording = 0;
 double altitude;
 double previousAltitude;
+bool dragRetracted = false;
+bool dragExtended = false;
 
 double linearXAccel;
 
@@ -56,12 +58,6 @@ int clockRate = 100;  //in ms
 
 
 void setup() {
-  //TODO REMOVE ME FOR ACTUAL ON BOARD TEST!!
-  // Open serial communications and wait for port to open:
-  //Serial.begin(9600);
-  //while (!Serial) {
-  //  ;  // wait for serial port to connect.
-  //}
 
   pinMode(buzzerPin, OUTPUT);
   pinMode(keySwitchPin, INPUT);
@@ -111,6 +107,15 @@ void setup() {
   dragServo.attach(servoPin);
   dragServo.write(90);
 
+
+  dragServo.write(-180);
+  delay(1000);
+  dragServo.write(180);
+  delay(1000);
+  dragServo.write(90);
+
+
+
   for (int i = 0; i < 10; i++) {
     beepBuzzer(500);
   }
@@ -122,7 +127,7 @@ void makeFileHeader() {
 
   // if the file is available, write to it:
   if (dataFile) {
-    dataFile.println("TIME\tALTITUDE\tORIENTATION_X\tORIENTATION_Y\tORIENTATION_Z\tANGVELOCITY_X\tANGVELOCITY_Y\tANGVELOCITY_Z\tLINEARACCEL_X\tLINEARACCEL_Y\tLINEARACCEL_Z\tMAGNETOMETER_X\tMAGNETOMETER_Y\tMAGNETOMETER_Z\tACCELEROMETER_X\tACCELEROMETER_Y\tACCELEROMETER_Z\tGRAVITY_X\tGRAVITY_Y\tGRAVITY_Z\t");
+    dataFile.println("TIME\tALTITUDE\tORIENTATION_X\tORIENTATION_Y\tORIENTATION_Z\tANGVELOCITY_X\tANGVELOCITY_Y\tANGVELOCITY_Z\tLINEARACCEL_X\tLINEARACCEL_Y\tLINEARACCEL_Z\tMAGNETOMETER_X\tMAGNETOMETER_Y\tMAGNETOMETER_Z\tACCELEROMETER_X\tACCELEROMETER_Y\tACCELEROMETER_Z\tGRAVITY_X\tGRAVITY_Y\tGRAVITY_Z\tAPOGEE\tAPOGEE_DETECTED\t_LAUNCH_DETECTED\tBURNOUT_DETECTED\tDRAG_EXTENDED\tDRAG_RETRACTED");
     dataFile.close();
     Serial.println("Header made");
     // print to the serial port too:
@@ -222,7 +227,7 @@ void beepBuzzer(int length) {
 
 //Launch Detection Variables
 double launchAccelThreshold = 15;
-int accelAboveThresholdCount = 100;  //Sample * clcokRate = Time in ms
+int accelAboveThresholdCount = 10;  //Sample * clcokRate = Time in ms
 bool launchDetected = false;
 int launchThresholdMetCount = 0;
 
@@ -241,7 +246,7 @@ void checkIfLaunch() {
 
 //Burnout detection Variables
 double burnoutThreshold = 0;
-int burnoutBelowCountThreshold = 50;  //Sample * clcokRate = Time in ms
+int burnoutBelowCountThreshold = 10;  //Sample * clcokRate = Time in ms
 int burnoutThresholdMetCount = 0;
 bool burnoutDetected = false;
 
@@ -259,6 +264,7 @@ void checkIfMotorBurnout() {
 int altitudeDecreaseCount = 0;
 bool apogeeFirstRun = true;
 double apogee = 0;
+bool apogeeDetected = false;
 void checkForApogee() {
 
   if (apogeeFirstRun) {
@@ -266,16 +272,21 @@ void checkForApogee() {
     apogeeFirstRun = false;
   }
 
-  if(altitude < previousAltitude){
-     altitudeDecreaseCount++;
-  }
-  else{
+  if (altitude < previousAltitude) {
+    altitudeDecreaseCount++;
+  } else {
     altitudeDecreaseCount = 0;
   }
 
-  if(altitudeDecreaseCount >= 10){
-
+  if (altitude > apogee) {
+    apogee = altitude;
   }
+
+  if (altitudeDecreaseCount >= 10) {
+    apogeeDetected = true;
+  }
+
+  previousAltitude = altitude;
 }
 
 void dataLog() {
@@ -284,6 +295,21 @@ void dataLog() {
   dataString += millis();
   dataString += altitudeRecording();
   dataString += bnoRecording();
+  dataString += apogee;
+  dataString += "\t";
+  dataString += apogeeDetected;
+  dataString += "\t";
+  dataString += launchDetected;
+  dataString += "\t";
+  dataString += burnoutDetected;
+  dataString += "\t";
+  dataString += dragExtended;
+  dataString += "\t";
+  dataString += dragRetracted;
+  dataString += "\t";
+
+
+
 
   // open the file.
   File dataFile = SD.open("datalog.txt", FILE_WRITE);
@@ -300,9 +326,8 @@ void dataLog() {
   }
 }
 
-double timeToExtend = 2000;
+double timeToExtend = 1000;
 bool firstExtendCall = true;
-bool dragExtended = false;
 bool extendTimeMet = false;
 double extendTime = 0;
 double extendLastTimeRecorded;
@@ -324,9 +349,8 @@ void extendDrag() {
   }
 }
 
-double timeToRetract = 2000;
+double timeToRetract = 1000;
 bool firstRetractCall = true;
-bool dragRetracted = false;
 bool retractTimeMet = false;
 double retractTime = 0;
 double retractLastTimeRecorded;
@@ -353,19 +377,18 @@ double retractionWaitTime = 0;
 double retractionWaitTimeThreshold = 15000;
 
 void loop() {
-  if (digitalRead(keySwitchPin) || true) {
+  //Key switch must be off to allow the system to run
+  if (!digitalRead(keySwitchPin)) {
 
-
+    //Every cycle we datalog and beep the buzzer as a delay to confirm working system
     dataLog();
     beepBuzzer(clockRate);  // Buzzer has built in delay using parameter
 
-    if (controlLoopAllowed) {
-      //launchDetected = true;
-      if (launchDetected || true) {
-        //burnoutDetected = true;
-        if (burnoutDetected ||true) {
-          //Control logic
+    if (controlLoopAllowed) {  //The loop only needs to run while controls are needed
 
+      if (launchDetected) {
+
+        if (burnoutDetected) {
           //Extend Drag
           extendDrag();
           //Check for apogee
