@@ -18,6 +18,14 @@ Ground level calibration
    Harrison Bonner
 */
 
+
+
+//DEBUG ENABLES
+
+//#define LAUNCH_DETECT_DEBUG
+//#define BURNOUT_DETECT_DEBUG
+
+
 #include <SD.h>
 #include <SPI.h>
 #include <Wire.h>
@@ -384,6 +392,12 @@ void loop() {
     dataLog();
     beepBuzzer(clockRate);  // Buzzer has built in delay using parameter
 
+#ifdef LAUNCH_DETECT_DEBUG
+    launchDetected = true;
+#endif
+#ifdef BURNOUT_DETECT_DEBUG
+    burnoutDetected = true;
+#endif
     if (controlLoopAllowed) {  //The loop only needs to run while controls are needed
 
       if (launchDetected) {
@@ -392,7 +406,6 @@ void loop() {
           //Extend Drag
           extendDrag();
           //Check for apogee
-          checkForApogee();
           //After 15 seconds retract
           if (dragExtended) {
             retractionWaitTime += millis() - lastTimeRecording;
@@ -417,5 +430,7 @@ void loop() {
       }
     }
   }
+
+  if (launchDetected) checkForApogee();
   lastTimeRecording = millis();
 }
