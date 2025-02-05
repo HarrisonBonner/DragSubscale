@@ -114,13 +114,8 @@ void setup() {
 
   dragServo.attach(servoPin);
   dragServo.write(90);
-
-
-  dragServo.write(-180);
-  delay(1000);
-  dragServo.write(180);
-  delay(1000);
-  dragServo.write(90);
+  delay(2000);
+  dragServo.write(0);  //Or 180
 
 
 
@@ -334,25 +329,14 @@ void dataLog() {
   }
 }
 
-double timeToExtend = 1000;
 bool firstExtendCall = true;
-bool extendTimeMet = false;
-double extendTime = 0;
-double extendLastTimeRecorded;
+
 void extendDrag() {
 
   if (firstExtendCall) {
-    dragServo.write(-180);
+    dragServo.write(180);
     firstExtendCall = false;
-    extendLastTimeRecorded = millis();
     Serial.println("Set Drag to extend");
-  }
-
-  extendTime += millis() - extendLastTimeRecorded;
-  extendLastTimeRecorded = millis();
-
-  if (extendTime >= timeToExtend && !dragExtended) {
-    dragServo.write(90);
     dragExtended = true;
   }
 }
@@ -365,16 +349,8 @@ double retractLastTimeRecorded;
 void retractDrag() {
   if (firstRetractCall) {
     Serial.println("Set Drag to Retract");
-    dragServo.write(180);
+    dragServo.write(0);
     firstRetractCall = false;
-    retractLastTimeRecorded = millis();
-  }
-
-  retractTime += millis() - retractLastTimeRecorded;
-  retractLastTimeRecorded = millis();
-  if (retractTime >= timeToRetract && !dragRetracted) {
-    Serial.println("ended retraction");
-    dragServo.write(90);
     dragRetracted = true;
   }
 }
@@ -384,9 +360,24 @@ bool controlLoopAllowed = true;
 double retractionWaitTime = 0;
 double retractionWaitTimeThreshold = 15000;
 
+bool mainLoopFirstTimeRun = true;
+
+void firstRunBIT() {
+  //Extend retract servo
+  dragServo.write(180);
+  delay(2000);
+  dragServo.write(0);
+  delay(2000);
+  mainLoopFirstTimeRun = false;
+}
+
 void loop() {
   //Key switch must be off to allow the system to run
   if (!digitalRead(keySwitchPin)) {
+
+    if (mainLoopFirstTimeRun) {
+      firstRunBIT();
+    }
 
     //Every cycle we datalog and beep the buzzer as a delay to confirm working system
     dataLog();
@@ -398,6 +389,7 @@ void loop() {
 #ifdef BURNOUT_DETECT_DEBUG
     burnoutDetected = true;
 #endif
+
     if (controlLoopAllowed) {  //The loop only needs to run while controls are needed
 
       if (launchDetected) {
@@ -429,6 +421,9 @@ void loop() {
         checkIfLaunch();
       }
     }
+  }
+  else{
+    mainLoopFirstTimeRun = true;
   }
 
   if (launchDetected) checkForApogee();
